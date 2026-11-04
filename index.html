@@ -989,6 +989,73 @@ select option { background: var(--dark); }
   text-align: right;
 }
 
+.daywise-timetable {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+  padding-bottom: 8px;
+}
+.daywise-day {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 14px;
+  min-height: 260px;
+}
+.daywise-day h3 {
+  margin: 0 0 18px;
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+  text-align: center;
+}
+.daywise-session {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 10px;
+  margin-bottom: 12px;
+}
+.daywise-session:last-child { margin-bottom: 0; }
+.daywise-session-time {
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 6px;
+}
+.daywise-session-name {
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.daywise-session-meta {
+  font-size: 0.76rem;
+  color: var(--subtle);
+  line-height: 1.5;
+}
+@media (max-width: 1100px) {
+  .daywise-timetable {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 768px) {
+  .daywise-timetable {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .daywise-timetable {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ============================================================
    BMI CALCULATOR
    ============================================================ */
@@ -1875,9 +1942,11 @@ select option { background: var(--dark); }
   margin-bottom: 16px;
 }
 .footer-desc { font-size: 0.9rem; color: var(--subtle); line-height: 1.7; margin-bottom: 28px; }
-.footer-social { display: flex; gap: 12px; }
+.footer-social { display: flex; gap: 12px; flex-wrap: wrap; }
+.social-icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.social-brand-icon { display: block; width: 18px; height: 18px; }
 .footer-social-btn {
-  width: 40px; height: 40px;
+  width: 36px; height: 36px;
   border-radius: 10px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1887,6 +1956,8 @@ select option { background: var(--dark); }
   transition: background var(--transition), color var(--transition), border-color var(--transition);
 }
 .footer-social-btn:hover { background: var(--red); color: var(--white); border-color: var(--red); }
+.footer-map-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 0.85rem; color: var(--subtle); transition: color var(--transition); }
+.footer-map-link:hover { color: var(--red); }
 .footer-col-title {
   font-family: var(--font-head);
   font-size: 0.8rem;
@@ -2188,11 +2259,11 @@ select option { background: var(--dark); }
 /* ============================================================
    ANIMATION HELPERS
    ============================================================ */
-.reveal { opacity: 0; transform: translateY(32px); }
-.reveal-left { opacity: 0; transform: translateX(-40px); }
-.reveal-right { opacity: 0; transform: translateX(40px); }
-.reveal-scale { opacity: 0; transform: scale(0.9); }
-.stagger-child { opacity: 0; transform: translateY(24px); }
+.reveal { opacity: 1; }
+.reveal-left { opacity: 1; }
+.reveal-right { opacity: 1; }
+.reveal-scale { opacity: 1; }
+.stagger-child { opacity: 1; }
 </style>
 </head>
 <body>
@@ -2468,13 +2539,13 @@ select option { background: var(--dark); }
     </div>
   </section>
 
-  <!-- SUPPLEMENTS / PRODUCTS PREVIEW -->
+  <!-- GYM GEAR / PRODUCTS PREVIEW -->
   <section class="section">
     <div class="container">
       <div class="section-head reveal">
         <div class="section-label">Featured Products</div>
-        <h2 class="section-title">Fuel Your <em>Performance</em></h2>
-        <p class="section-sub">Premium supplements hand-picked by our coaches. Tested, verified, results-proven.</p>
+        <h2 class="section-title">Gear Up for <em>Every Workout</em></h2>
+        <p class="section-sub">Training essentials for strength, mobility, and recovery — picked for your next session.</p>
         <div class="divider"></div>
       </div>
       <div class="grid-4" id="productsPreview"></div>
@@ -2541,7 +2612,7 @@ select option { background: var(--dark); }
   <!-- CLASS SCHEDULE PREVIEW -->
   <section class="section">
     <div class="container">
-      <div class="section-head reveal">
+      <div class="section-head">
         <div class="section-label">Class Schedule</div>
         <h2 class="section-title">This Week's <em>Classes</em></h2>
         <p class="section-sub">Join 50+ weekly classes led by certified instructors. All levels welcome.</p>
@@ -2557,6 +2628,11 @@ select option { background: var(--dark); }
         <button class="schedule-tab" onclick="filterSchedule(this,'Sun')">Sunday</button>
       </div>
       <div class="schedule-grid" id="scheduleGrid"></div>
+      <div class="section-head" style="margin:48px 0 0">
+        <div class="section-label">Full Week Overview</div>
+        <h3 class="section-title" style="font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:0">Day-wise <em>Timetable</em></h3>
+      </div>
+      <div class="daywise-timetable" id="dayWiseTimetable" aria-label="Day-wise timetable"></div>
       <div style="text-align:center;margin-top:40px">
         <button class="btn btn-outline" onclick="showPage('classes')">View All Classes →</button>
       </div>
@@ -2871,7 +2947,7 @@ select option { background: var(--dark); }
             <div class="plan-feature">4 PT sessions/month</div>
             <div class="plan-feature">Monthly nutrition review</div>
             <div class="plan-feature">InBody quarterly</div>
-            <div class="plan-feature">10% supplement discount</div>
+            <div class="plan-feature">10% gym gear discount</div>
           </div>
           <button class="btn btn-ghost" style="width:100%" onclick="showPopup('member')">Join 6 Months</button>
         </div>
@@ -2884,7 +2960,7 @@ select option { background: var(--dark); }
             <div class="plan-feature">Unlimited PT sessions</div>
             <div class="plan-feature">Monthly meal plan</div>
             <div class="plan-feature">Priority booking</div>
-            <div class="plan-feature">15% supplement discount</div>
+            <div class="plan-feature">15% gym gear discount</div>
           </div>
           <button class="btn btn-ghost" style="width:100%" onclick="showPopup('member')">Join Annual</button>
         </div>
@@ -2899,7 +2975,7 @@ select option { background: var(--dark); }
             <div class="plan-feature">Custom meal plan monthly</div>
             <div class="plan-feature">InBody scans monthly</div>
             <div class="plan-feature">Sauna & recovery</div>
-            <div class="plan-feature">20% supplement discount</div>
+            <div class="plan-feature">20% gym gear discount</div>
           </div>
           <button class="btn btn-red" style="width:100%" onclick="showPopup('member')">Go VIP Elite</button>
         </div>
@@ -3039,7 +3115,7 @@ select option { background: var(--dark); }
     <div class="container">
       <div class="grid-3" id="classesAll"></div>
       <div style="margin-top:72px">
-        <div class="section-head reveal" style="margin-bottom:40px">
+        <div class="section-head" style="margin-bottom:40px">
           <div class="section-label">Weekly Schedule</div>
           <h2 class="section-title">This Week's <em>Timetable</em></h2>
           <div class="divider"></div>
@@ -3061,6 +3137,11 @@ select option { background: var(--dark); }
           <button class="filter-btn" onclick="filterDifficulty(this,'Advanced')">Advanced</button>
         </div>
         <div class="schedule-grid" id="scheduleAll"></div>
+        <div class="section-head" style="margin:48px 0 0">
+          <div class="section-label">Full Week Overview</div>
+          <h3 class="section-title" style="font-size:clamp(1.8rem,3vw,2.8rem);margin-bottom:0">Day-wise <em>Timetable</em></h3>
+        </div>
+        <div class="daywise-timetable" id="dayWiseTimetableClasses" aria-label="Day-wise timetable"></div>
       </div>
     </div>
   </section>
@@ -3098,18 +3179,16 @@ select option { background: var(--dark); }
   <div class="page-banner">
     <div class="container">
       <div class="page-banner-eyebrow">Performance Store</div>
-      <h1 class="page-banner-title">SUPPLEMENT<br><span style="background:var(--grad-fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SHOP</span></h1>
-      <p class="page-banner-sub">Clinically tested. Coach approved. Delivered to your door.</p>
+      <h1 class="page-banner-title">GYM<br><span style="background:var(--grad-fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent">GEAR</span></h1>
+      <p class="page-banner-sub">Everyday training equipment and accessories for your fitness journey.</p>
     </div>
   </div>
   <section class="section">
     <div class="container">
       <div class="shop-filters">
         <button class="filter-btn active" onclick="filterProducts(this,'all')">All Products</button>
-        <button class="filter-btn" onclick="filterProducts(this,'protein')">Protein</button>
-        <button class="filter-btn" onclick="filterProducts(this,'preworkout')">Pre-Workout</button>
-        <button class="filter-btn" onclick="filterProducts(this,'recovery')">Recovery</button>
-        <button class="filter-btn" onclick="filterProducts(this,'vitamins')">Vitamins</button>
+        <button class="filter-btn" onclick="filterProducts(this,'strength')">Strength</button>
+        <button class="filter-btn" onclick="filterProducts(this,'mobility')">Mobility & Recovery</button>
         <button class="filter-btn" onclick="filterProducts(this,'accessories')">Accessories</button>
       </div>
       <div class="grid-4" id="shopAll"></div>
@@ -3127,19 +3206,14 @@ select option { background: var(--dark); }
       <div class="product-detail-grid">
         <div>
           <div class="product-gallery-main" id="pdImg"><i data-lucide="dumbbell"></i></div>
-          <div class="product-gallery-thumbs">
-            <div class="product-thumb active"><i data-lucide="dumbbell"></i></div>
-            <div class="product-thumb"><i data-lucide="package"></i></div>
-            <div class="product-thumb"><i data-lucide="check-circle"></i></div>
-          </div>
         </div>
         <div>
-          <div class="product-cat" id="pdCat">PROTEIN</div>
+          <div class="product-cat" id="pdCat">STRENGTH</div>
           <h1 style="font-family:var(--font-head);font-size:2.2rem;font-weight:900;color:var(--white);margin-bottom:16px" id="pdName">Product Name</h1>
           <div class="product-rating">★★★★★ <span style="color:var(--subtle);font-size:0.85rem">(124 reviews)</span></div>
           <div class="product-detail-price" id="pdPrice"><span>₹</span>2,999</div>
           <div class="product-old-price" id="pdOld">₹3,599</div>
-          <p style="color:var(--subtle);line-height:1.7;margin-bottom:28px" id="pdDesc">Premium quality supplement for your performance goals.</p>
+          <p style="color:var(--subtle);line-height:1.7;margin-bottom:28px" id="pdDesc">Training gear built for your performance goals.</p>
           <div class="qty-wrap">
             <span class="qty-label">Qty</span>
             <div class="qty-control">
@@ -3164,27 +3238,21 @@ select option { background: var(--dark); }
             <button class="product-tab" onclick="switchPdTab(this,'reviews')">Reviews</button>
           </div>
           <div class="product-tab-content active" id="pd-desc">
-            <p style="color:var(--subtle);line-height:1.8" id="pdDescFull">Full product description will appear here with ingredient breakdown, usage directions, and dosage information.</p>
+            <p style="color:var(--subtle);line-height:1.8" id="pdDescFull">Product details will appear here.</p>
           </div>
           <div class="product-tab-content" id="pd-specs">
-            <div style="display:flex;flex-direction:column;gap:0">
-              <div class="bank-detail-row"><span class="bank-detail-label">Serving Size</span><span class="bank-detail-value">30g (1 scoop)</span></div>
-              <div class="bank-detail-row"><span class="bank-detail-label">Servings Per Container</span><span class="bank-detail-value">30</span></div>
-              <div class="bank-detail-row"><span class="bank-detail-label">Protein Per Serving</span><span class="bank-detail-value">24g</span></div>
-              <div class="bank-detail-row"><span class="bank-detail-label">Calories</span><span class="bank-detail-value">120 kcal</span></div>
-              <div class="bank-detail-row"><span class="bank-detail-label">Country of Origin</span><span class="bank-detail-value">USA / India (blended)</span></div>
-            </div>
+            <div style="display:flex;flex-direction:column;gap:0" id="pdSpecs"></div>
           </div>
           <div class="product-tab-content" id="pd-reviews">
             <div style="display:flex;flex-direction:column;gap:20px">
               <div class="testimonial-card" style="padding:24px">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Absolutely incredible product. Mixed well, no clumps, great taste and my strength gains are unreal."</p>
+                <p class="testimonial-text">"Great quality and comfortable to use. It has become a regular part of my training setup."</p>
                 <div class="testimonial-author"><div class="testimonial-avatar"><i data-lucide="user-circle"></i></div><div><div class="testimonial-name">Rahul M.</div><div class="testimonial-meta">Verified Purchase</div></div></div>
               </div>
               <div class="testimonial-card" style="padding:24px">
                 <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Best whey I've ever used. Trainer recommended it and I've been on it 3 months with outstanding results."</p>
+                <p class="testimonial-text">"Exactly what I needed for my workouts. Solid build, easy to use, and arrived quickly."</p>
                 <div class="testimonial-author"><div class="testimonial-avatar"><i data-lucide="user-circle"></i></div><div><div class="testimonial-name">Ananya S.</div><div class="testimonial-meta">Verified Purchase</div></div></div>
               </div>
             </div>
@@ -3598,6 +3666,34 @@ select option { background: var(--dark); }
   </div>
 </section>
 
+<svg class="social-icon-sprite" aria-hidden="true" focusable="false">
+  <symbol id="social-facebook" viewBox="0 0 24 24">
+    <path d="M13.5 21v-8h2.8l.4-3h-3.2V8.1c0-.9.3-1.5 1.6-1.5h1.7V3.9c-.3 0-1.4-.1-2.6-.1-2.6 0-4.3 1.6-4.3 4.4V10H7v3h2.9v8h3.6z" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-instagram" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="17.5" cy="6.8" r="1.2" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-youtube" viewBox="0 0 24 24">
+    <path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path d="m9.7 15.5 5.9-3.5-5.9-3.5v7Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-linkedin" viewBox="0 0 24 24">
+    <path d="M5.2 8.6H2.1V21h3.1V8.6ZM3.7 7.1a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6ZM21.9 13.9c0-3.7-2-5.4-4.7-5.4a4.1 4.1 0 0 0-3.7 2v-1.7h-3V21h3.1v-6.1c0-1.6.3-3.2 2.3-3.2s2 1.9 2 3.3V21H21.9v-7.1Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-x" viewBox="0 0 24 24">
+    <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-5-7.3L5.5 22H2.3l7.3-8.4L1.8 2h6.5l4.5 6.7L18.9 2Zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-tiktok" viewBox="0 0 24 24">
+    <path d="M19.6 7.2a6.1 6.1 0 0 1-4-1.5v8.1a6.2 6.2 0 1 1-5.4-6.1v3.5a2.8 2.8 0 1 0 2 2.7V2h3.4a6.1 6.1 0 0 0 4 3.7v1.5Z" fill="currentColor"/>
+  </symbol>
+  <symbol id="social-whatsapp" viewBox="0 0 24 24">
+    <path d="M20.5 11.7a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.5-4.9a8.4 8.4 0 1 1 16-3.9Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M9 8.2c-.3-.7-.6-.7-.9-.7h-.7c-.2 0-.6.1-.9.5-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.1 3.4 5.2 4.6 2.6 1 3.1.8 3.7.7.6-.1 1.9-.8 2.1-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.7-.4l-2.1-1c-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.1-1.3-.5-2.5-1.6-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.4.5-.6.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5L9 8.2Z" fill="currentColor"/>
+  </symbol>
+</svg>
+
 <!-- ============================================================
      GLOBAL FOOTER (appears on every page)
      ============================================================ -->
@@ -3608,12 +3704,13 @@ select option { background: var(--dark); }
         <div class="footer-logo">IRONFORGE</div>
         <p class="footer-desc">Premium fitness club forging champions since 2015. State-of-the-art equipment, elite coaching, and a transformation-first culture in Pune.</p>
         <div class="footer-social">
-          <a class="footer-social-btn" href="https://facebook.com" target="_blank" title="Facebook"><i data-lucide="facebook"></i></a>
-          <a class="footer-social-btn" href="https://instagram.com" target="_blank" title="Instagram"><i data-lucide="instagram"></i></a>
-          <a class="footer-social-btn" href="https://youtube.com" target="_blank" title="YouTube"><i data-lucide="youtube"></i></a>
-          <a class="footer-social-btn" href="https://linkedin.com" target="_blank" title="LinkedIn"><i data-lucide="linkedin"></i></a>
-          <a class="footer-social-btn" href="https://wa.me/919876543210" target="_blank" title="WhatsApp" style="border-color:rgba(37,211,102,0.3)"><i data-lucide="message-circle"></i></a>
-          <a class="footer-social-btn" href="https://maps.google.com/?q=Koregaon+Park+Pune" target="_blank" title="Google Maps"><i data-lucide="map-pin"></i></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-facebook"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-instagram"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-youtube"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-linkedin"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="X" title="X"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-x"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-tiktok"></use></svg></a>
+          <a class="footer-social-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp" style="border-color:rgba(37,211,102,0.3)"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-whatsapp"></use></svg></a>
         </div>
       </div>
       <div>
@@ -3648,6 +3745,7 @@ select option { background: var(--dark); }
         <div style="margin-top:24px">
           <div class="footer-col-title" style="margin-bottom:12px">Find Us</div>
           <p style="font-size:0.85rem;color:var(--subtle);line-height:1.6">47 Fitness Avenue, Koregaon Park<br>Pune 411001, Maharashtra</p>
+          <a class="footer-map-link" href="https://example.com/ironforge/maps" target="_blank" rel="noopener noreferrer"><i data-lucide="map-pin"></i> Get directions</a>
           <p style="font-size:0.85rem;color:var(--subtle);margin-top:8px">Mon–Fri: 5AM–11PM<br>Sat–Sun: 6AM–10PM</p>
         </div>
       </div>
@@ -3803,42 +3901,78 @@ const TRAINERS = [
 ];
 
 const PRODUCTS = [
-  {id:1,name:"Iron Whey Protein 2kg",cat:"protein",catLabel:"Protein",
-   img:"https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="cup-soda"></i>',price:2999,old:3599,badge:"Best Seller"},
-  {id:2,name:"Pre-Forge Pump Pre-Workout",cat:"preworkout",catLabel:"Pre-Workout",
-   img:"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="zap"></i>',price:1799,old:2199,badge:"New"},
-  {id:3,name:"Recovery BCAA Blast",cat:"recovery",catLabel:"Recovery",
-   img:"https://images.unsplash.com/photo-1546483875-ad9014c88eba?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="pill"></i>',price:1399,old:null,badge:null},
-  {id:4,name:"Daily Multivitamin Pro",cat:"vitamins",catLabel:"Vitamins",
-   img:"https://images.unsplash.com/photo-1550572017-edd951b55104?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="leaf"></i>',price:899,old:1099,badge:null},
-  {id:5,name:"IronForge Lifting Belt",cat:"accessories",catLabel:"Accessories",
-   img:"https://images.unsplash.com/photo-1517344884509-a0c97ec11bcc?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="shirt"></i>',price:1499,old:null,badge:null},
-  {id:6,name:"Creatine Monohydrate 500g",cat:"recovery",catLabel:"Recovery",
-   img:"https://images.unsplash.com/photo-1579722820308-d74e571900a9?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="dumbbell"></i>',price:1099,old:1299,badge:"Best Seller"},
-  {id:7,name:"Mass Gainer Pro 3kg",cat:"protein",catLabel:"Protein",
-   img:"https://images.unsplash.com/photo-1622484212385-e9a40b4bca6e?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="package"></i>',price:3499,old:3999,badge:null},
-  {id:8,name:"Omega-3 Fish Oil Caps",cat:"vitamins",catLabel:"Vitamins",
-   img:"https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="fish"></i>',price:699,old:null,badge:null},
-  {id:9,name:"IronForge Lifting Gloves",cat:"accessories",catLabel:"Accessories",
-   img:"https://images.unsplash.com/photo-1581009137042-c552e485697a?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="hand"></i>',price:799,old:999,badge:null},
-  {id:10,name:"Electrolyte Hydration Mix",cat:"recovery",catLabel:"Recovery",
-   img:"https://images.unsplash.com/photo-1622543925917-763c34d1a86e?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="droplets"></i>',price:999,old:null,badge:"New"},
-  {id:11,name:"Vegan Protein Isolate",cat:"protein",catLabel:"Protein",
-   img:"https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="sprout"></i>',price:3199,old:3699,badge:null},
-  {id:12,name:"Stim-Free Pre-Workout",cat:"preworkout",catLabel:"Pre-Workout",
-   img:"https://images.unsplash.com/photo-1546483875-ad9014c88eba?auto=format&fit=crop&w=600&q=85",
-   icon:'<i data-lucide="citrus"></i>',price:1599,old:null,badge:null},
+  {id:1,name:"Chrome Dumbbell Pair — 5kg",cat:"strength",catLabel:"Strength",
+   img:"https://images.unsplash.com/photo-1784894645353-81486c66a687?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="dumbbell"></i>',price:3499,old:3999,badge:"Best Seller",
+   description:"A compact pair of chrome-finish dumbbells for strength work at home or in the gym.",
+   details:"Build a versatile strength routine with this 5kg dumbbell pair. The compact shape is easy to store, while the textured handles provide a steady grip for curls, presses, rows, and accessory movements.",
+   specs:[["Equipment","Dumbbell pair"],["Weight","5kg each"],["Finish","Chrome"],["Best for","Strength training"]]},
+  {id:2,name:"Cast-Iron Kettlebell — 12kg",cat:"strength",catLabel:"Strength",
+   img:"https://images.unsplash.com/photo-1632077804406-188472f1a810?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="dumbbell"></i>',price:2499,old:2999,badge:"Popular",
+   description:"A sturdy 12kg kettlebell for swings, carries, squats, and full-body training.",
+   details:"Add strength and conditioning work to your routine with a durable cast-iron kettlebell. Its balanced handle supports two-handed and single-handed movements, from kettlebell swings to goblet squats.",
+   specs:[["Equipment","Kettlebell"],["Weight","12kg"],["Material","Cast iron"],["Best for","Strength & conditioning"]]},
+  {id:3,name:"Resistance Band Set",cat:"mobility",catLabel:"Mobility & Recovery",
+   img:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="activity"></i>',price:899,old:1199,badge:"New",
+   description:"Portable resistance bands for warm-ups, mobility drills, and strength exercises.",
+   details:"Keep training flexible with a lightweight resistance-band set. Use the bands for assisted movements, activation drills, stretching, and low-impact strength sessions at home or on the go.",
+   specs:[["Equipment","Resistance band set"],["Use","Strength & mobility"],["Portability","Travel-friendly"],["Best for","Warm-ups & home workouts"]]},
+  {id:4,name:"Non-Slip Training Mat",cat:"mobility",catLabel:"Mobility & Recovery",
+   img:"https://images.unsplash.com/photo-1637157216470-d92cd2edb2e8?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="flower-2"></i>',price:1299,old:1599,badge:null,
+   description:"A cushioned, grippy mat for floor exercises, stretching, and yoga sessions.",
+   details:"Create a comfortable surface for floor-based workouts and mobility sessions. The non-slip texture helps the mat stay in place during stretches, core exercises, and yoga flows.",
+   specs:[["Equipment","Training mat"],["Surface","Non-slip texture"],["Use","Floor workouts & yoga"],["Care","Wipe clean"]]},
+  {id:5,name:"Olympic Barbell — 7ft",cat:"strength",catLabel:"Strength",
+   img:"https://images.unsplash.com/photo-1521805103424-d8f8430e8933?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="dumbbell"></i>',price:7999,old:9999,badge:"Pro Gear",
+   description:"A full-length barbell for compound lifts and progressive strength training.",
+   details:"Set up for foundational barbell movements such as squats, deadlifts, and presses. Pair this 7ft bar with compatible plates to build a progressive strength-training setup.",
+   specs:[["Equipment","Olympic barbell"],["Length","7ft"],["Use","Compound lifts"],["Plates","Sold separately"]]},
+  {id:6,name:"Grip Training Gloves",cat:"accessories",catLabel:"Accessories",
+   img:"https://images.unsplash.com/photo-1557127972-1c446ea89ea5?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="hand"></i>',price:699,old:899,badge:null,
+   description:"Fingerless training gloves designed for a comfortable grip during lifting sessions.",
+   details:"Add a layer of grip and comfort to your training with lightweight fingerless gloves. The open-finger design keeps your hands free for handling weights and gym equipment.",
+   specs:[["Equipment","Training gloves"],["Style","Fingerless"],["Use","Weight training"],["Care","Air dry after use"]]},
+  {id:7,name:"High-Density Foam Roller",cat:"mobility",catLabel:"Mobility & Recovery",
+   img:"https://images.unsplash.com/photo-1646376248949-9db1b3b7bce4?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="activity"></i>',price:999,old:1299,badge:null,
+   description:"A firm foam roller for warm-ups, cool-downs, and post-workout mobility work.",
+   details:"Use this foam roller as part of your warm-up or cool-down routine. Its firm surface is suited to controlled rolling and mobility exercises for major muscle groups.",
+   specs:[["Equipment","Foam roller"],["Density","High-density"],["Use","Mobility & warm-ups"],["Care","Wipe clean"]]},
+  {id:8,name:"Gym Water Bottle",cat:"accessories",catLabel:"Accessories",
+   img:"https://images.unsplash.com/photo-1592582228635-ad72046ce827?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="droplets"></i>',price:599,old:799,badge:null,
+   description:"A reusable bottle to keep water close during training and throughout the day.",
+   details:"Stay hydrated at the gym, at work, or on the move with a reusable bottle. Its simple, portable design fits easily into a training bag.",
+   specs:[["Equipment","Reusable bottle"],["Use","Workout hydration"],["Design","Portable"],["Care","Hand wash"]]},
+  {id:9,name:"Ab Roller Wheel",cat:"strength",catLabel:"Strength",
+   img:"https://images.unsplash.com/photo-1547919307-1ecb10702e6f?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="circle-dot"></i>',price:749,old:999,badge:null,
+   description:"A compact wheel for core-strengthening rollouts and stability exercises.",
+   details:"Add controlled rollouts to your core-training routine with a compact ab wheel. Start with a comfortable range of motion and build gradually as your strength and stability improve.",
+   specs:[["Equipment","Ab roller wheel"],["Use","Core training"],["Design","Compact"],["Best for","Home workouts"]]},
+  {id:10,name:"Speed Skipping Rope",cat:"accessories",catLabel:"Accessories",
+   img:"https://images.unsplash.com/photo-1758875568447-aa45a5d3b351?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="zap"></i>',price:499,old:699,badge:"New",
+   description:"A lightweight skipping rope for cardio warm-ups and conditioning sessions.",
+   details:"Bring a simple cardio tool to your workout with a lightweight speed rope. Use it for warm-ups, interval training, or conditioning at the gym and outdoors.",
+   specs:[["Equipment","Skipping rope"],["Use","Cardio & conditioning"],["Design","Lightweight"],["Best for","Warm-ups & intervals"]]},
+  {id:11,name:"Training Duffle Bag",cat:"accessories",catLabel:"Accessories",
+   img:"https://images.unsplash.com/photo-1689007657910-544b2dea3bb0?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="package"></i>',price:1499,old:1999,badge:null,
+   description:"A roomy duffle to carry workout clothes and everyday training essentials.",
+   details:"Keep your workout essentials together in a versatile training duffle. The spacious main compartment makes it easy to pack clothes, a towel, and accessories for your next session.",
+   specs:[["Equipment","Training duffle"],["Use","Gym & travel"],["Storage","Main compartment"],["Care","Spot clean"]]},
+  {id:12,name:"Rubber Hex Dumbbell Pair — 10kg",cat:"strength",catLabel:"Strength",
+   img:"https://images.unsplash.com/photo-1638536534984-0d98ccdb6af5?auto=format&fit=crop&w=900&q=85",
+   icon:'<i data-lucide="dumbbell"></i>',price:4999,old:5999,badge:null,
+   description:"A heavier dumbbell pair for progressive strength work and compound accessory lifts.",
+   details:"Progress your dumbbell training with a 10kg pair suited to presses, rows, lunges, and other strength movements. The hex shape helps keep the weights from rolling when set down.",
+   specs:[["Equipment","Hex dumbbell pair"],["Weight","10kg each"],["Finish","Rubber-coated"],["Best for","Strength training"]]},
 ];
 
 const CLASSES = [
@@ -4241,10 +4375,10 @@ function openTrainerDetail(trainerIndex) {
       <div>
         <div class="trainer-detail-photo" style="background-image:url('${t.img}');background-size:cover;background-position:center top"></div>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
-          <a class="trainer-social" href="#" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><i data-lucide="instagram"></i></a>
-          <a class="trainer-social" href="#" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><i data-lucide="facebook"></i></a>
-          <a class="trainer-social" href="#" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><i data-lucide="youtube"></i></a>
-          <a class="trainer-social" href="#" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><i data-lucide="linkedin"></i></a>
+          <a class="trainer-social" href="https://example.com/trainers/instagram" target="_blank" rel="noopener noreferrer" aria-label="Trainer Instagram" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-instagram"></use></svg></a>
+          <a class="trainer-social" href="https://example.com/trainers/facebook" target="_blank" rel="noopener noreferrer" aria-label="Trainer Facebook" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-facebook"></use></svg></a>
+          <a class="trainer-social" href="https://example.com/trainers/youtube" target="_blank" rel="noopener noreferrer" aria-label="Trainer YouTube" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-youtube"></use></svg></a>
+          <a class="trainer-social" href="https://example.com/trainers/linkedin" target="_blank" rel="noopener noreferrer" aria-label="Trainer LinkedIn" style="width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--subtle);transition:all 0.3s;font-size:1rem"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-linkedin"></use></svg></a>
         </div>
       </div>
       <div>
@@ -4358,9 +4492,9 @@ function openBlogPost(idx) {
       <div class="blog-post-meta-item"><i data-lucide="clock"></i> ${b.read}</div>
       <div class="blog-share" style="margin-left:auto;display:flex;align-items:center;gap:8px">
         <span style="font-size:0.8rem;color:var(--subtle)">Share:</span>
-        <button class="share-btn" title="Share on Facebook"><i data-lucide="facebook"></i></button>
-        <button class="share-btn" title="Share on Twitter"><i data-lucide="twitter"></i></button>
-        <button class="share-btn" title="Share on WhatsApp"><i data-lucide="message-circle"></i></button>
+        <button class="share-btn" title="Share on Facebook" aria-label="Share on Facebook"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-facebook"></use></svg></button>
+        <button class="share-btn" title="Share on X" aria-label="Share on X"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-x"></use></svg></button>
+        <button class="share-btn" title="Share on WhatsApp" aria-label="Share on WhatsApp"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-whatsapp"></use></svg></button>
         <button class="share-btn" title="Copy link" onclick="navigator.clipboard.writeText(window.location.href);showToast('Link copied!')"><i data-lucide="link"></i></button>
       </div>
     </div>
@@ -4439,9 +4573,9 @@ function trainerCard(t, idx) {
   return `<div class="trainer-card stagger-child" style="cursor:pointer" onclick="openTrainerDetail(${idx})">
     <div class="trainer-img-placeholder" style="background-image:url('${t.img}');background-size:cover;background-position:center top">
       <div class="trainer-overlay">
-        <a class="trainer-social" href="#" onclick="event.stopPropagation()"><i data-lucide="instagram"></i></a>
-        <a class="trainer-social" href="#" onclick="event.stopPropagation()"><i data-lucide="facebook"></i></a>
-        <a class="trainer-social" href="#" onclick="event.stopPropagation()"><i data-lucide="twitter"></i></a>
+        <a class="trainer-social" href="https://example.com/trainers/instagram" target="_blank" rel="noopener noreferrer" aria-label="Trainer Instagram" onclick="event.stopPropagation()"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-instagram"></use></svg></a>
+        <a class="trainer-social" href="https://example.com/trainers/facebook" target="_blank" rel="noopener noreferrer" aria-label="Trainer Facebook" onclick="event.stopPropagation()"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-facebook"></use></svg></a>
+        <a class="trainer-social" href="https://example.com/trainers/x" target="_blank" rel="noopener noreferrer" aria-label="Trainer X" onclick="event.stopPropagation()"><svg class="social-brand-icon" aria-hidden="true"><use href="#social-x"></use></svg></a>
       </div>
     </div>
     <div class="trainer-info">
@@ -4517,8 +4651,11 @@ function openProduct(id) {
   document.getElementById('pdPrice').innerHTML = `<span>₹</span>${p.price.toLocaleString('en-IN')}`;
   document.getElementById('pdOld').textContent = p.old ? `₹${p.old.toLocaleString('en-IN')}` : '';
   document.getElementById('pdOld').style.display = p.old ? 'block' : 'none';
-  document.getElementById('pdDesc').textContent = `Premium ${p.catLabel.toLowerCase()} formulated for serious athletes. Coach-approved, lab-tested for purity and potency.`;
-  document.getElementById('pdDescFull').textContent = `${p.name} is crafted with high-quality ingredients to support your fitness goals. Each batch is third-party tested for purity, free from banned substances, and formulated based on the latest sports nutrition research. Mixes easily, tastes great, and delivers consistent results when paired with a structured training program.`;
+  document.getElementById('pdDesc').textContent = p.description;
+  document.getElementById('pdDescFull').textContent = p.details;
+  document.getElementById('pdSpecs').innerHTML = p.specs.map(([label, value]) =>
+    `<div class="bank-detail-row"><span class="bank-detail-label">${label}</span><span class="bank-detail-value">${value}</span></div>`
+  ).join('');
   document.getElementById('pdQty').value = 1;
   showPage('product');
 }
@@ -4761,7 +4898,7 @@ function renderClasses() {
 
 function scheduleRow(s) {
   const diffClass = s.difficulty.toLowerCase();
-  return `<div class="schedule-item stagger-child">
+  return `<div class="schedule-item">
     <div class="schedule-time">${s.time}</div>
     <div>
       <div class="schedule-class">${s.cls}</div>
@@ -4790,6 +4927,37 @@ function renderSchedule(day, targetId) {
     ? filtered.map(scheduleRow).join('')
     : '<p style="color:var(--subtle);text-align:center;padding:32px">No classes match this filter — try another day or difficulty.</p>';
   refreshIcons();
+}
+
+function renderDayWiseTimetable() {
+  const targets = ['dayWiseTimetable', 'dayWiseTimetableClasses'];
+  const dayOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayNames = { Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday' };
+
+  targets.forEach(targetId => {
+    const container = document.getElementById(targetId);
+    if (!container) return;
+
+    container.innerHTML = dayOrder.map(day => {
+      const daySessions = SCHEDULE.filter(item => item.day === day);
+      const content = daySessions.length
+        ? daySessions.map(session => `
+            <div class="daywise-session">
+              <div class="daywise-session-time">${session.time}</div>
+              <div class="daywise-session-name">${session.cls}</div>
+              <div class="daywise-session-meta">with ${session.trainer}<br>${session.duration} • ${session.difficulty}</div>
+            </div>
+          `).join('')
+        : '<div class="daywise-session"><div class="daywise-session-meta">Rest day</div></div>';
+
+      return `
+        <div class="daywise-day">
+          <h3>${dayNames[day]}</h3>
+          ${content}
+        </div>
+      `;
+    }).join('');
+  });
 }
 
 function filterSchedule(btn, day) {
@@ -5086,6 +5254,7 @@ function initSite() {
   renderClasses();
   renderSchedule('Mon', 'scheduleGrid');
   renderSchedule('Mon', 'scheduleAll');
+  renderDayWiseTimetable();
   renderTransformations();
   renderTestimonials();
   renderBlog();
